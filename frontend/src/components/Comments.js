@@ -81,9 +81,6 @@ class App extends Component {
       .delete(`http://localhost:8000/api/tasks/${item.id}/`)
       .then((res) => this.refreshList());
   };
-  // handleDelete = item => {//add this after modal creation
-  //   alert("delete" + JSON.stringify(item));//add this after modal creation
-  // };
 
   // Create item
   createItem = () => {
