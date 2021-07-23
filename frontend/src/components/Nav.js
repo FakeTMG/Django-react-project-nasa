@@ -7,8 +7,14 @@ class NasaNav extends Component {
 
     this.state = {};
   }
+
+  logout =() =>{
+    localStorage.clear();
+  }
+
   render() {
-    const { isHomePage, filterText, home, creator, comment } = this.props;
+    const { isHomePage, filterText, home, creator, comment, login, register } =
+      this.props;
     return (
       <div
         style={{ position: "fixed", top: "0", width: "100%", zIndex: "100" }}
@@ -71,26 +77,65 @@ class NasaNav extends Component {
                 </form>
               ) : null}
               <ul className="navbar-nav mb-2 mb-lg-0">
-                <li className="nav-item">
-                  <Link
-                    className={`${home} nav-link`}
-                    to="register"
-                    tabindex="-1"
-                    aria-disabled="true"
-                  >
-                    Sign Up
-                  </Link>
-                </li>
-                <li className="nav-item">
-                  <Link
-                    className={`${home} nav-link`}
-                    to="login"
-                    tabindex="-1"
-                    aria-disabled="true"
-                  >
-                    Login
-                  </Link>
-                </li>
+                {localStorage.getItem("status") === "logged" ? (
+                  <li className="nav-item dropdown" style={{marginRight:'100px'}}>
+                    <a
+                      className="nav-link dropdown-toggle"
+                      href="/"
+                      id="navbarDropdown"
+                      role="button"
+                      data-bs-toggle="dropdown"
+                      aria-expanded="false"
+                    >
+                      {localStorage.getItem("username")}
+                    </a>
+                    <ul
+                      className="dropdown-menu"
+                      aria-labelledby="navbarDropdown"
+                    >
+                      <li>
+                        <a className="dropdown-item" href="/">
+                          Change Password
+                        </a>
+                      </li>
+                      <li>
+                        <hr className="dropdown-divider" />
+                      </li>
+                      <li>
+                        <a
+                          onClick={this.logout}
+                          className="dropdown-item"
+                          href="/"
+                        >
+                          Log out
+                        </a>
+                      </li>
+                    </ul>
+                  </li>
+                ) : (
+                  <React.Fragment>
+                    <li className="nav-item">
+                      <Link
+                        className={`${register} nav-link`}
+                        to="register"
+                        tabindex="-1"
+                        aria-disabled="true"
+                      >
+                        Sign Up
+                      </Link>
+                    </li>
+                    <li className="nav-item">
+                      <Link
+                        className={`${login} nav-link`}
+                        to="login"
+                        tabindex="-1"
+                        aria-disabled="true"
+                      >
+                        Login
+                      </Link>
+                    </li>
+                  </React.Fragment>
+                )}
               </ul>
             </div>
           </div>

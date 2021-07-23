@@ -43,16 +43,14 @@ function SingleHomePage({posts,searchTerm,first,second,third,fourth}) {
             : ImageForPc.map((item) => <Item src={item.title} key={item.id} />)}
         </Carousel>
 
-        <div class="container">
           <h1 className="test">Nasa News</h1>
           {posts
             .filter((val) => {
               return val.title.toLowerCase().includes(searchTerm.toLowerCase());
             })
             .map((val) => {
-              return <SingleNasa val={val} />;
+              return <SingleNasa val={val} key={val.date} />;
             })}
-        </div>
       </div>
     );
        

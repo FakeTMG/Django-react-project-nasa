@@ -27,7 +27,6 @@ class HomePage extends Component {
         "https://api.nasa.gov/planetary/apod?api_key=RDjAmaAvEeRa5ibvhXKqhcqoUJQjishbP2shAuzF&count=9"
       )
       .then((response) => {
-        console.log(response);
         this.setState({ posts: response.data, loading: true });
       })
       .catch((error) => {

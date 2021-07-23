@@ -7,8 +7,9 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      modal:false,
+      modal: false,
       activeItem: {
+        created_by: localStorage.getItem("username"),
         message: "",
         created_dt: "",
       },
@@ -35,21 +36,29 @@ class App extends Component {
         className="list-group-item d-flex justify-content-between align-items-center"
       >
         <span className={`todo-title mr-2 `}>
-          <h4>Created by : Anonymous<span style={{fontSize: "12px"}}> {item.created_dt}</span> </h4> {item.message}
+          <h4 id={item.id}>
+            Created by : {item.created_by}
+            <span style={{ fontSize: "12px" }}> {item.created_dt}</span>{" "}
+          </h4>{" "}
+          {item.message}
         </span>
         <span>
-          <button
-            onClick={() => this.editItem(item)}
-            className="btn btn-secondary mr-2"
-          >
-            Edit
-          </button>
-          <button
-            onClick={() => this.handleDelete(item)}
-            className="btn btn-danger"
-          >
-            Delete
-          </button>
+          {localStorage.getItem("username") === item.created_by ? (
+            <div>
+              <button
+                onClick={() => this.editItem(item)}
+                className="btn btn-secondary mr-2"
+              >
+                Edit
+              </button>
+              <button
+                onClick={() => this.handleDelete(item)}
+                className="btn btn-danger"
+              >
+                Delete
+              </button>
+            </div>
+          ) : null}
         </span>
       </li>
     ));
@@ -77,27 +86,43 @@ class App extends Component {
 
   // Delete item
   handleDelete = (item) => {
-    axios
-      .delete(`http://localhost:8000/api/tasks/${item.id}/`)
-      .then((res) => this.refreshList());
+    if (localStorage.getItem("status") === "logged") {
+      axios
+        .delete(`http://localhost:8000/api/tasks/${item.id}/`)
+        .then((res) => this.refreshList());
+    } else {
+      window.location = "/login";
+    }
   };
 
   // Create item
   createItem = () => {
-    const item = { message: "", created_dt: "" };
-    this.setState({ activeItem: item, modal: !this.state.modal });
+    if (localStorage.getItem("status") === "logged") {
+      const item = {
+        created_by: localStorage.getItem("username"),
+        message: "",
+        created_dt: "",
+      };
+      this.setState({ activeItem: item, modal: !this.state.modal });
+    } else {
+      window.location = "/login";
+    }
   };
 
   //Edit item
   editItem = (item) => {
-    this.setState({ activeItem: item, modal: !this.state.modal });
+    if (localStorage.getItem("status") === "logged") {
+      this.setState({ activeItem: item, modal: !this.state.modal });
+    } else {
+      window.location = "/login";
+    }
   };
 
   // -I- Start by visual effects to viewer
   render() {
     return (
       <div>
-        <NasaNav comment='active' />
+        <NasaNav comment="active" />
         <br />
         <br />
         <main className="content">

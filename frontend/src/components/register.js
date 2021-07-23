@@ -1,49 +1,101 @@
 import React, { Component } from "react";
-import Nav from "./Nav";
+import axios from "axios";
+import NasaNav from "./Nav";
 
-class register extends Component {
+class App extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      username: "",
+      email: "",
+      password: "",
+    };
+  }
+
+  // Add componentDidMount()
+  componentDidMount() {}
+  // Main variable to render items on the screen
+  // Submit an item
+  handleSubmit = (e) => {
+    e.preventDefault();
+    axios
+      .post("http://127.0.0.1:8000/api/register/", this.state)
+      .then((respose) => {
+        window.location = "/login";
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+  changeHandler = (e) => {
+    this.setState({ [e.target.name]: e.target.value });
+  };
+
+  // Create item
+  // -I- Start by visual effects to viewer
   render() {
+    const { username, email, password } = this.state;
     return (
       <div>
-        <Nav />
-        <div class="container">
+        <NasaNav register="active" />
+        <div className="container">
           <br />
           <br />
           <br />
           <br />
           <br />
           <h3>Register </h3>
-          <p>Please enter the following details as explained to finish your registration.</p>
+          <p>
+            Please enter the following details as explained to finish your
+            registration.
+          </p>
           <form>
-            <div class="input-group">
+            <div className="input-group">
               <input
-                id="email"
                 type="text"
-                class="form-control"
-                name="email"
-                placeholder="Email"
+                className="form-control"
+                name="username"
+                value={username}
+                placeholder="Username"
+                onChange={this.changeHandler}
               />
-              <span class="input-group-addon">
-                <i class="glyphicon glyphicon-user"></i>
+              <span className="input-group-addon">
+                <i
+                  className="glyphicon glyphicon-user"
+                  style={{ color: "red" }}
+                >
+                  Required. 150 characters or fewer. Letters, digits and
+                  @/./+/-/_ only.
+                </i>
               </span>
             </div>
-            <div class="input-group">
+            <div className="input-group">
               <input
-                id="password"
-                type="password"
-                class="form-control"
-                name="password"
-                placeholder="Password"
+                type="text"
+                className="form-control"
+                name="email"
+                value={email}
+                placeholder="Email address"
+                onChange={this.changeHandler}
               />
-              <span class="input-group-addon">
-                <i class="glyphicon glyphicon-lock"></i>
-              </span>
             </div>
+            <div className="input-group">
+              <input
+                type="password"
+                className="form-control"
+                name="password"
+                value={password}
+                placeholder="Password"
+                onChange={this.changeHandler}
+              />
+            </div>
+            <button onClick={this.handleSubmit} className="btn btn-primary">
+              Submit
+            </button>
           </form>
         </div>
       </div>
     );
   }
 }
-
-export default register;
+export default App;

@@ -1,49 +1,80 @@
 import React, { Component } from "react";
-import Nav from "./Nav";
+import axios from "axios";
+import NasaNav from "./Nav";
 
-class login extends Component {
+class App extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      username: "",
+      password: "",
+    };
+  }
+
+  handleSubmit = (e) => {
+    e.preventDefault();
+    axios
+      .post("http://127.0.0.1:8000/api/login/", this.state)
+      .then((respose) => {
+        localStorage.setItem("status", "logged");
+        localStorage.setItem(
+          "username",
+          JSON.parse(respose.config.data).username
+        );
+        window.location = "/";
+      })
+      .catch((error) => {
+        document.getElementById("error").innerText =
+          "Wrong email/password (email,password are required )";
+        this.setState({ username: "", password: "" });
+      });
+  };
+  changeHandler = (e) => {
+    this.setState({ [e.target.name]: e.target.value });
+  };
+
   render() {
+    const { username, password } = this.state;
     return (
       <div>
-        <Nav />
-        <div class="container">
+        <NasaNav login="active" />
+        <div className="container">
           <br />
           <br />
           <br />
           <br />
           <br />
-          <h3>Login </h3>
-          <p>Please enter your email and password as explained.</p>
+          <h3>Log in</h3>
+          <p>Please enter the following details as explained to login.</p>
+          <p id="error" style={{ color: "red" }}></p>
           <form>
-            <div class="input-group">
+            <div className="input-group">
               <input
-                id="email"
                 type="text"
-                class="form-control"
-                name="email"
-                placeholder="Email"
+                className="form-control"
+                name="username"
+                value={username}
+                placeholder="Username"
+                onChange={this.changeHandler}
               />
-              <span class="input-group-addon">
-                <i class="glyphicon glyphicon-user"></i>
-              </span>
             </div>
-            <div class="input-group">
+            <div className="input-group">
               <input
-                id="password"
                 type="password"
-                class="form-control"
+                className="form-control"
                 name="password"
+                value={password}
                 placeholder="Password"
+                onChange={this.changeHandler}
               />
-              <span class="input-group-addon">
-                <i class="glyphicon glyphicon-lock"></i>
-              </span>
             </div>
+            <button onClick={this.handleSubmit} className="btn btn-primary">
+              Submit
+            </button>
           </form>
         </div>
       </div>
     );
   }
 }
-
-export default login;
+export default App;
