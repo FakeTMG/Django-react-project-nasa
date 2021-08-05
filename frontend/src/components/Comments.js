@@ -2,35 +2,41 @@ import React, { Component } from "react";
 import Modal from "./Modal";
 import axios from "axios";
 import NasaNav from "./Nav";
+import { access } from "../redux/tokens";
+import { connect } from "react-redux";
 
-class App extends Component {
+const mapStateToProps = (state) => {
+  return {
+    userData: state.user,
+  };
+};
+
+class Comments extends Component {
   constructor(props) {
     super(props);
     this.state = {
       modal: false,
+      CommentsList: [],
       activeItem: {
-        created_by: localStorage.getItem("username"),
         message: "",
-        created_dt: "",
       },
-      taskList: [],
     };
   }
 
-  // Add componentDidMount()
   componentDidMount() {
     this.refreshList();
   }
 
   refreshList = () => {
     axios //Axios to send and receive HTTP requests
-      .get("http://localhost:8000/api/tasks/")
-      .then((res) => this.setState({ taskList: res.data }))
-      .catch((err) => console.log(err));
+      .get("http://localhost:8000/api/comments/")
+      .then((res) => {
+        this.setState({ CommentsList: res.data });
+      });
   };
   // Main variable to render items on the screen
   renderItems = () => {
-    return this.state.taskList.map((item) => (
+    return this.state.CommentsList.map((item) => (
       <li
         key={item.id}
         className="list-group-item d-flex justify-content-between align-items-center"
@@ -38,12 +44,12 @@ class App extends Component {
         <span className={`todo-title mr-2 `}>
           <h4 id={item.id}>
             Created by : {item.created_by}
-            <span style={{ fontSize: "12px" }}> {item.created_dt}</span>{" "}
-          </h4>{" "}
+            <span style={{ fontSize: "12px" }}> {item.created_dt}</span>
+          </h4>
           {item.message}
         </span>
         <span>
-          {localStorage.getItem("username") === item.created_by ? (
+          {item.created_by === this.props.userData.users ? (
             <div>
               <button
                 onClick={() => this.editItem(item)}
@@ -74,21 +80,23 @@ class App extends Component {
     if (item.id) {
       // if old post to edit and submit
       axios
-        .put(`http://localhost:8000/api/tasks/${item.id}/`, item)
+        .put(`http://localhost:8000/api/comments/${item.id}/`, item, access)
         .then((res) => this.refreshList());
       return;
     }
     // if new post to submit
     axios
-      .post("http://localhost:8000/api/tasks/", item)
-      .then((res) => this.refreshList());
+      .post("http://localhost:8000/api/comments/", item, access)
+      .then((res) => {
+        this.refreshList();
+      });
   };
 
   // Delete item
   handleDelete = (item) => {
-    if (localStorage.getItem("status") === "logged") {
+    if (item.id) {
       axios
-        .delete(`http://localhost:8000/api/tasks/${item.id}/`)
+        .delete(`http://localhost:8000/api/comments/${item.id}/`, access)
         .then((res) => this.refreshList());
     } else {
       window.location = "/login";
@@ -97,11 +105,9 @@ class App extends Component {
 
   // Create item
   createItem = () => {
-    if (localStorage.getItem("status") === "logged") {
+    if (this.props.userData.users) {
       const item = {
-        created_by: localStorage.getItem("username"),
         message: "",
-        created_dt: "",
       };
       this.setState({ activeItem: item, modal: !this.state.modal });
     } else {
@@ -111,7 +117,7 @@ class App extends Component {
 
   //Edit item
   editItem = (item) => {
-    if (localStorage.getItem("status") === "logged") {
+    if (this.props.userData.users) {
       this.setState({ activeItem: item, modal: !this.state.modal });
     } else {
       window.location = "/login";
@@ -153,4 +159,4 @@ class App extends Component {
     );
   }
 }
-export default App;
+export default connect(mapStateToProps)(Comments);

@@ -22,6 +22,7 @@ class HomePage extends Component {
 
   componentDidMount() {
     document.title = "MohamedFm | Home";
+    
     axios
       .get(
         "https://api.nasa.gov/planetary/apod?api_key=RDjAmaAvEeRa5ibvhXKqhcqoUJQjishbP2shAuzF&count=9"

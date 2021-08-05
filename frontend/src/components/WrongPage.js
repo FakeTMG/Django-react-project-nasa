@@ -1,11 +1,11 @@
 import React, { Component } from 'react'
-import Nav from './Nav'
+import NasaNav from "./Nav";
 
 class WrongPage extends Component {
     render() {
         return (
           <div>
-            <Nav />
+            <NasaNav />
             <br />
             <br />
             <br />
