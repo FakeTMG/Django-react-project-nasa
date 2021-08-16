@@ -1,9 +1,11 @@
+import Cookies from "js-cookie";
+
 export const access = {
   headers: {
-    Authorization: "Bearer " + localStorage.getItem("access"),
+    Authorization: "Bearer " + Cookies.get("access"),
   },
 };
 
 export const refresh = {
-  refresh: localStorage.getItem("refresh"),
+  refresh: Cookies.get("refresh"),
 };

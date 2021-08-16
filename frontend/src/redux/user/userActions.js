@@ -5,23 +5,27 @@ import {
   FETCH_USERS_FAILURE,
 } from "./userTypes";
 import { access, refresh } from "../tokens";
+import Cookies from "js-cookie";
 
 export const fetchUsers = () => {
   return (dispatch) => {
     dispatch(fetchUsersRequest());
     axios
-      .get("http://127.0.0.1:8000/auth/user/", access)
+      .get("auth/user/", access)
       .then((response) => {
         // response.data is the users
         const users = response.data.username;
         dispatch(fetchUsersSuccess(users));
       })
       .catch((error) => {
-        if (localStorage.getItem('refresh')) {
-          axios.post("auth/token/refresh/", refresh).then((res) =>{
-            localStorage.setItem("access", res.data.access);
+        if (Cookies.get("refresh")) {
+          axios.post("auth/token/refresh/", refresh).then((res) => {
+            Cookies.set("access", res.data.access);
             document.location.reload();
-          } )
+          });
+        } else {
+          Cookies.remove("access");
+          Cookies.remove("refresh");
         }
       });
   };

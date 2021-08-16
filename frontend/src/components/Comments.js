@@ -29,7 +29,7 @@ class Comments extends Component {
 
   refreshList = () => {
     axios //Axios to send and receive HTTP requests
-      .get("http://localhost:8000/api/comments/")
+      .get("api/comments/")
       .then((res) => {
         this.setState({ CommentsList: res.data });
       });
@@ -80,13 +80,13 @@ class Comments extends Component {
     if (item.id) {
       // if old post to edit and submit
       axios
-        .put(`http://localhost:8000/api/comments/${item.id}/`, item, access)
+        .put(`api/comments/${item.id}/`, item, access)
         .then((res) => this.refreshList());
       return;
     }
     // if new post to submit
     axios
-      .post("http://localhost:8000/api/comments/", item, access)
+      .post("api/comments/", item, access)
       .then((res) => {
         this.refreshList();
       });
@@ -96,7 +96,7 @@ class Comments extends Component {
   handleDelete = (item) => {
     if (item.id) {
       axios
-        .delete(`http://localhost:8000/api/comments/${item.id}/`, access)
+        .delete(`api/comments/${item.id}/`, access)
         .then((res) => this.refreshList());
     } else {
       window.location = "/login";

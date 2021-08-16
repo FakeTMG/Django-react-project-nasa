@@ -17,7 +17,6 @@ class Forgot extends Component {
     super(props);
     this.state = {
       email: "",
-      redirect_url: "http://localhost:3000/change",
     };
   }
 

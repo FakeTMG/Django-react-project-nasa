@@ -1,10 +1,10 @@
 import React, { Component } from "react";
 import NasaNav from "./Nav";
 import axios from "axios";
-
+import Cookies from "js-cookie";
 const config = {
   headers: {
-    Authorization: "Bearer " + localStorage.getItem("access"),
+    Authorization: "Bearer " + Cookies.get("access"),
   },
 };
 
@@ -26,11 +26,24 @@ export class ChangePass extends Component {
       document.getElementById("password1").value ===
       document.getElementById("password2").value
     ) {
-      axios.patch("auth/change-password/", this.state, config).then((res) => {
-        window.location="/"
-      });
+      e.preventDefault();
+      axios
+        .patch("auth/change-password/", this.state, config)
+        .then((res) => {
+          document.getElementById("error").innerText = res.data.message;
+        })
+        .catch((err) => {
+          console.log(err.response.data.old_password);
+          {
+            err.response.data.old_password
+              ? (document.getElementById("error").innerText =
+                  err.response.data.old_password)
+              : (document.getElementById("error").innerText =
+                  err.response.data.new_password);
+          }
+        });
     } else {
-      e.preventDefault()
+      e.preventDefault();
       document.getElementById("error").innerText =
         "Your passwords do not match !";
     }

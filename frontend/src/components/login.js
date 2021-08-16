@@ -1,6 +1,10 @@
 import React, { Component } from "react";
 import axios from "axios";
 import NasaNav from "./Nav";
+import Cookies from "js-cookie";
+import TwitterLogin from "react-twitter-login";
+import FacebookLogin from "react-facebook-login";
+import GoogleLogin from "react-google-login";
 
 class login extends Component {
   constructor(props) {
@@ -11,23 +15,119 @@ class login extends Component {
     };
   }
 
+  TwitterauthHandler = (err, data) => {
+    console.log(err, data);
+    if (data) {
+      const TwitterLogin = {
+        access_token_key: data.oauth_token,
+        access_token_secret: data.oauth_token_secret,
+      };
+      axios
+        .post("social_auth/twitter/", TwitterLogin)
+        .then((res) => {
+          Cookies.set("access", res.data.tokens.access);
+          Cookies.set("refresh", res.data.tokens.refresh);
+          window.location = "/";
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    } else {
+      document.getElementById("error").innerText = err;
+    }
+  };
+
+  responseFacebook = (response) => {
+    console.log(response);
+    const FacebookLogin = {
+      auth_token: response.accessToken,
+    };
+    axios
+      .post("social_auth/facebook/", FacebookLogin)
+      .then((res) => {
+        Cookies.set("access", res.data.tokens.access);
+        Cookies.set("refresh", res.data.tokens.refresh);
+        window.location = "/";
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  responseGoogle = (response) => {
+    console.log(response);
+    const GoogleLogin = {
+      auth_token: response.tokenId,
+    };
+    axios
+      .post("social_auth/google/", GoogleLogin)
+      .then((res) => {
+        Cookies.set("access", res.data.tokens.access);
+        Cookies.set("refresh", res.data.tokens.refresh);
+        window.location = "/";
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  displayResend = () => {
+    document.getElementById("wait").innerText =
+      "Wait 60 seconds to be able to resend the verification email again";
+    setTimeout(() => {
+      document.getElementById(
+        "resend"
+      ).innerText = `Click here to resend the e-mail.`;
+      document.getElementById("wait").innerText = "";
+    }, 60000);
+    setTimeout(() => {
+      document.getElementById("error").innerText = "";
+    }, 30000);
+  };
+
+  Resend = (e) => {
+    e.preventDefault();
+    axios.post("auth/request-resend-email/", this.state).then((response) => {});
+    this.setState({ error: "" });
+    document.getElementById(
+      "error"
+    ).innerText = `We have resent you the verification link !`;
+    document.getElementById("resend").innerText = "";
+    this.displayResend();
+  };
+
   handleSubmit = (e) => {
     e.preventDefault();
     axios
       .post("auth/login/", this.state)
       .then((res) => {
-        localStorage.setItem("access", res.data.tokens.access);
-        localStorage.setItem("refresh", res.data.tokens.refresh);
+        Cookies.set("access", res.data.tokens.access);
+        Cookies.set("refresh", res.data.tokens.refresh);
         window.location = "/";
       })
       .catch((error) => {
-        document.getElementById("error").innerText = "Wrong E-mail or Password! ";
+        console.log(error.response);
         if (error.response.data.detail) {
-          document.getElementById("or").innerText = "or ";
-          document.getElementById("resend").innerText =
-            "Resend Verification E-mail ?";
+          if (error.response.data.detail === "Email is not verified") {
+            document.getElementById("or").innerText = "or ";
+            document.getElementById(
+              "resend"
+            ).innerText = `Click here to resend the e-mail.`;
+            document.getElementById("error").innerText =
+              error.response.data.detail +
+              "! Click Resend Verification E-mail to resend the email";
+            document.getElementById("EmailSpan").innerText = "";
+          } else {
+            document.getElementById("error").innerText =
+              error.response.data.detail;
+            document.getElementById("EmailSpan").innerText = "";
+          }
         } else if (error.response.data.email) {
-          document.getElementById("EmailSpan").innerText = error.response.data.email;
+          document.getElementById("EmailSpan").innerText =
+            error.response.data.email;
+        } else {
+          document.getElementById("error").innerText =
+            "Wrong E-mail or Password! ";
         }
       });
   };
@@ -39,7 +139,7 @@ class login extends Component {
     const { email, password } = this.state;
     return (
       <div>
-        {localStorage.getItem("access") ? (
+        {Cookies.get("access") ? (
           (window.location = "/")
         ) : (
           <React.Fragment>
@@ -63,8 +163,11 @@ class login extends Component {
                     placeholder="email"
                     onChange={this.changeHandler}
                   />
-                  <span id='EmailSpan' className="input-group-addon" style={{ color: "red" }}>
-                  </span>
+                  <span
+                    id="EmailSpan"
+                    className="input-group-addon"
+                    style={{ color: "red" }}
+                  ></span>
                 </div>
                 <div className="input-group">
                   <input
@@ -75,18 +178,47 @@ class login extends Component {
                     placeholder="Password"
                     onChange={this.changeHandler}
                   />
-                  <span id='PassworSpan' className="input-group-addon" style={{ color: "red" }}>
-                  </span>
+                  <span
+                    id="PassworSpan"
+                    className="input-group-addon"
+                    style={{ color: "red" }}
+                  ></span>
                 </div>
                 <div>
                   <a href="forgot">Forgot Password ? </a>
                   <span id="or"></span>
-                  <a href="resendemail" id="resend"></a>
+                  <div>
+                    <a href="#" id="resend" onClick={this.Resend}>
+                      <i aria-hidden="true"></i>
+                    </a>
+                    <p id="wait"></p>
+                  </div>
                 </div>
                 <button onClick={this.handleSubmit} className="btn btn-primary">
                   Submit
                 </button>
               </form>
+              <br />
+              <div>
+                <TwitterLogin
+                  authCallback={this.TwitterauthHandler}
+                  consumerKey="umw1Y8WgJKEh1Uzx9bIcWutoZ"
+                  consumerSecret="jlCFM0KRWU8IU3fH80smcA6qbEb7tfnDhNzzKrHyfxhASAyAVB"
+                />
+                <FacebookLogin
+                  appId="311083047436492"
+                  fields="name,email,picture"
+                  callback={this.responseFacebook}
+                  icon="fa-facebook"
+                />
+                <GoogleLogin
+                  clientId="966562096769-ma6psgh8vj5gptfi2dogq6oc3bfdbp79.apps.googleusercontent.com"
+                  buttonText="Login"
+                  onSuccess={this.responseGoogle}
+                  onFailure={this.responseGoogle}
+                  cookiePolicy={"single_host_origin"}
+                />
+              </div>
             </div>
           </React.Fragment>
         )}

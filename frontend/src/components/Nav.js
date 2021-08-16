@@ -4,6 +4,7 @@ import axios from "axios";
 import { connect } from "react-redux";
 import { fetchUsers } from "../redux";
 import { access, refresh } from "../redux/tokens";
+import Cookies from "js-cookie";
 
 function NasaNav({
   isHomePage,
@@ -18,14 +19,15 @@ function NasaNav({
 }) {
   useEffect(() => {
     fetchUsers();
-  }, []);
+  }, [fetchUsers]);
 
   const logout = (e) => {
     e.preventDefault()
     axios
       .post("auth/logout/", refresh, access)
       .then((res) => {
-        localStorage.clear();
+        Cookies.remove("access");
+        Cookies.remove("refresh");
         window.location = "/";
       })
       .catch((error) => console.log(error.response));
@@ -65,7 +67,7 @@ function NasaNav({
                 <Link
                   className={`${comment} nav-link`}
                   to="/comments"
-                  tabindex="-1"
+                  tabIndex="-1"
                   aria-disabled="true"
                 >
                   Comments
@@ -124,7 +126,7 @@ function NasaNav({
                     <Link
                       className={`${register} nav-link`}
                       to="register"
-                      tabindex="-1"
+                      tabIndex="-1"
                       aria-disabled="true"
                     >
                       Sign Up
@@ -134,7 +136,7 @@ function NasaNav({
                     <Link
                       className={`${login} nav-link`}
                       to="login"
-                      tabindex="-1"
+                      tabIndex="-1"
                       aria-disabled="true"
                     >
                       Login

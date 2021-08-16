@@ -11,31 +11,42 @@ import Change from "./components/Change";
 import ChangePass from "./components/change-password";
 import login from "./components/login";
 import register from "./components/register";
-import resend from "./components/resend";
-import store from "./redux/store";
-import { Provider } from "react-redux";
+import { connect } from "react-redux";
+import { fetchUsers } from "./redux";
 
 class App extends Component {
+  componentDidMount() {
+    fetchUsers();
+  }
   render() {
     return (
-      <Provider store={store}>
-        <Router>
-          <Switch>
-            <Route path="/" exact component={HomePage} />
-            <Route path="/creatorinfo" component={CreatorInfo} />
-            <Route path="/comments" component={Comments} />
-            <Route path="/login" component={login} />
-            <Route path="/forgot" component={Forgot} />
-            <Route path="/change" component={Change} />
-            <Route path="/resendemail" component={resend} />
-            <Route path="/settings/password" component={ChangePass} />
-            <Route path="/register" component={register} />
-            <Route path="/" component={WrongPage} />
-          </Switch>
-        </Router>
-      </Provider>
+      <Router>
+        <Switch>
+          <Route path="/" exact component={HomePage} />
+          <Route path="/creatorinfo" component={CreatorInfo} />
+          <Route path="/comments" component={Comments} />
+          <Route path="/login" component={login} />
+          <Route path="/forgot" component={Forgot} />
+          <Route path="/change" component={Change} />
+          <Route path="/settings/password" component={ChangePass} />
+          <Route path="/register" component={register} />
+          <Route path="/" component={WrongPage} />
+        </Switch>
+      </Router>
     );
   }
 }
 
-export default App;
+const mapStateToProps = (state) => {
+  return {
+    userData: state.user,
+  };
+};
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    fetchUsers: () => dispatch(fetchUsers()),
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(App);

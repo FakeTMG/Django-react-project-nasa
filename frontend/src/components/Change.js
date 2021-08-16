@@ -8,8 +8,8 @@ export class Change extends Component {
 
     this.state = {
       password: "",
-      token: localStorage.getItem("token"),
-      uidb64: localStorage.getItem("uidb64"),
+      token: "",
+      uidb64: "",
     };
   }
 
@@ -22,23 +22,9 @@ export class Change extends Component {
     const uidb64Array = second.splice(0, 1);
     const TokenArray = second.splice(0);
     const uidb64 = uidb64Array.toString();
-    localStorage.setItem("uidb64", uidb64);
+    this.setState({ uidb64: uidb64 });
     const token = TokenArray.toString();
-    localStorage.setItem("token", token);
-  }
-
-  componentDidUpdate() {
-    const url = window.location.href;
-    const first = url.split("uidb64=");
-    first.shift();
-    const firststring = first.toString();
-    const second = firststring.split("&token=");
-    const uidb64Array = second.splice(0, 1);
-    const TokenArray = second.splice(0);
-    const uidb64 = uidb64Array.toString();
-    localStorage.setItem("uidb64", uidb64);
-    const token = TokenArray.toString();
-    localStorage.setItem("token", token);
+    this.setState({ token: token });
   }
 
   changeHandler = (e) => {
@@ -53,7 +39,7 @@ export class Change extends Component {
       axios.patch("auth/password-reset-complete", this.state).then((res) => {
         localStorage.clear();
         window.location = "/login";
-      });
+      }).catch((err) =>document.getElementById("error").innerText = err.response.data.password )
     } else {
       document.getElementById("error").innerText =
         "Your passwords do not match !";

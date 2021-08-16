@@ -19,6 +19,7 @@ class UserSerializer(serializers.ModelSerializer):
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(
         max_length=68, min_length=6, write_only=True)
+    username = serializers.CharField(min_length=3)
 
     default_error_messages = {
         'username': 'The username should only contain alphanumeric characters'}
@@ -97,8 +98,6 @@ class LoginSerializer(serializers.ModelSerializer):
 class ResetPasswordEmailRequestSerializer(serializers.Serializer):
     email = serializers.EmailField(min_length=2)
 
-    redirect_url = serializers.CharField(max_length=500, required=False)
-
     class Meta:
         fields = ['email']
 
@@ -133,6 +132,10 @@ class SetNewPasswordSerializer(serializers.Serializer):
             raise AuthenticationFailed('The reset link is invalid', 401)
         return super().validate(attrs)
 
+class ChangePasswordSerializer(serializers.Serializer):
+    model = User
+    old_password = serializers.CharField(required=True)
+    new_password = serializers.CharField(required=True, min_length=6, max_length=68, write_only=True)
 
 class LogoutSerializer(serializers.Serializer):
     refresh = serializers.CharField()
@@ -152,9 +155,3 @@ class LogoutSerializer(serializers.Serializer):
 
         except TokenError:
             self.fail('bad_token')
-
-
-class ChangePasswordSerializer(serializers.Serializer):
-    model = User
-    old_password = serializers.CharField(required=True)
-    new_password = serializers.CharField(required=True)
