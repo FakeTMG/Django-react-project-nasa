@@ -203,16 +203,16 @@ class login extends Component {
                 <TwitterLogin
                   authCallback={this.TwitterauthHandler}
                   consumerKey="umw1Y8WgJKEh1Uzx9bIcWutoZ"
-                  consumerSecret="jlCFM0KRWU8IU3fH80smcA6qbEb7tfnDhNzzKrHyfxhASAyAVB"
+                  consumerSecret="asba"
                 />
                 <FacebookLogin
-                  appId="311083047436492"
+                  appId="asba"
                   fields="name,email,picture"
                   callback={this.responseFacebook}
                   icon="fa-facebook"
                 />
                 <GoogleLogin
-                  clientId="966562096769-ma6psgh8vj5gptfi2dogq6oc3bfdbp79.apps.googleusercontent.com"
+                  clientId="asba"
                   buttonText="Login"
                   onSuccess={this.responseGoogle}
                   onFailure={this.responseGoogle}
